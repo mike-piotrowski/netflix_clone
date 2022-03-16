@@ -1,47 +1,60 @@
 import React from "react";
-import { useHref } from "react-router-dom";
+import { useState } from "react";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import "./SignupScreen.css";
 
 function SignupScreen() {
-  // const emailRef = useHref(null);
-  // const passwordRef = useHref(null);
-  //
-  // const register = (e) => {
-  //   e.preventDefault();
-  //
-  //   createUserWithEmailAndPassword(
-  //     auth,
-  //     emailRef.current.value,
-  //     passwordRef.current.value
-  //   )
-  //     .then((authUser) => {
-  //       console.log(authUser);
-  //     })
-  //     .catch((error) => {
-  //       alert(error.message);
-  //     });
-  // };
-  //
-  // const signIn = (e) => {
-  //   e.preventDefault();
-  // };
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+
+  const [user, setUser] = useState({});
+
+  onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser);
+  });
+
+  const register = async () => {
+    try {
+      const user = await createUserWithEmailAndPassword(auth, registerEmail, registerPassword);
+      console.log(user);
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+  };
 
   return (
     <div className="signupScreen">
       <form>
-        <h1>Sign In</h1>
-        {/*<input ref={emailRef} placeholder="Email" type="email" />*/}
-        {/*<input ref={passwordRef} placeholder="Password" type="password" />*/}
-        {/*<button type="submit" onClick={signIn}>*/}
-        {/*  Sign In*/}
-        {/*</button>*/}
+        <h1>Sign Up</h1>
+        <input
+          value={registerEmail}
+          placeholder="Email"
+          type="email"
+          onChange={(event) => {
+            setRegisterEmail(event.target.value);
+          }}
+        />
+        <input
+          value={registerPassword}
+          placeholder="Password"
+          type="password"
+          onChange={(event) => {
+            setRegisterPassword(event.target.value);
+          }}
+        />
+        <button type="submit" onClick={register}>
+          Sign Up
+        </button>
         <h4>
           <span className="signupScreen__gray">New to Netflix? </span>
-          {/*<span className="signupScreen__link" onClick={register}>*/}
-          {/*  Sign up now.{" "}*/}
-          {/*</span>*/}
+          <span className="signupScreen__link" onClick={registerEmail}>
+            Sign up now.{" "}
+          </span>
         </h4>
       </form>
     </div>
